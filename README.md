@@ -1,59 +1,140 @@
-# SimpleshopFrontend
+# 🛍️ SimpleShop - Frontend (SaaS Multi-Tenant)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.2.
+Frontend moderno y escalable para la plataforma **SimpleShop**, un SaaS diseñado para la **gestión de inventario** y **tiendas online**.  
+Construido con **Angular 18+ (Standalone)** y estilizado con **Tailwind CSS v4**, siguiendo una identidad visual **"Noir Industrial"**.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Características Principales
 
+### 🎨 UI/UX & Diseño
+- **Tema Personalizado:** Estética *Noir Industrial* (fondos oscuros, acentos ámbar/dorado, glassmorphism).
+- **Diseño Responsivo:** Totalmente adaptable a móviles, tablets y escritorio.
+- **Landing Page:** Optimizada para conversión con animaciones CSS nativas.
+
+---
+
+### 🔐 Autenticación & Seguridad
+- **Multi-Tenant Real:** Registro automático de tiendas con creación de *slug* único  
+  (ej: `simpleshop.com/store/mi-tienda`).
+- **Roles y Permisos:** Redirección automática según tipo de usuario (`OWNER`, `SUPER_ADMIN`).
+- **Interceptors:** Inserción automática del Token JWT en cada petición HTTP.
+- **Guards:** Protección de rutas privadas a nivel de módulo y vista.
+
+---
+
+### 👑 Módulo “Platform” (Super Admin)
+- **Panel Global:** Métricas de ingresos, usuarios y tiendas activas.
+- **Gestión de Tenants:** Listado completo con funcionalidad de **Kill Switch** (baneo/desactivación remota).
+- **Protección de Integridad:** Bloqueo de auto-desactivación del tenant principal.
+
+---
+
+### 📦 Módulo “Admin” (Tenants)
+- **Dashboard:** Resumen de estadísticas internas de cada tienda.
+- **Inventario:** (En desarrollo) Gestión de productos y control de stock.
+- **Layout Dedicado:** Menú lateral con estética ámbar e identidad del usuario.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+- **Framework:** Angular 18+  
+- **Arquitectura:** Standalone Components (sin NgModules)  
+- **Estado:** Angular Signals (`signal()`, `computed()`)  
+- **Control de Flujo:** Nueva sintaxis (`@if`, `@for`)  
+- **Estilos:** Tailwind CSS v4  
+- **Variables:** CSS nativas (`--color-brand-primary`)  
+- **Utilidades Tailwind:** `bg-linear-to-r`, opacidades simplificadas (`bg-black/50`)  
+- **Lenguaje:** TypeScript 5.x  
+
+---
+
+## 📂 Estructura del Proyecto (Clean Architecture)
+
+```bash
+src/app/
+├── core/               # Lógica de negocio (Singleton)
+│   ├── interceptors/   # AuthInterceptor (Tokens)
+│   ├── models/         # Interfaces (User, Tenant, Auth, Platform)
+│   └── services/       # API Services (AuthService, PlatformService)
+├── features/           # Módulos funcionales
+│   ├── auth/           # Login, Register
+│   ├── admin/          # Dashboard, Products
+│   ├── platform/       # Super Admin Panel
+│   └── landing/        # Landing pública
+├── layout/             # Estructuras visuales
+│   ├── admin-layout/   # Layout Ámbar
+│   └── platform-layout/# Layout Dorado/Negro
+└── shared/             # Componentes UI reutilizables
+```
+
+---
+
+## ⚙️ Instalación y Configuración
+
+### 1. Prerrequisitos
+- Node.js v18+  
+- Angular CLI  
+```bash
+npm install -g @angular/cli
+```
+
+### 2. Clonar el repositorio
+```bash
+git clone https://github.com/tu-usuario/simpleshop-frontend.git
+cd simpleshop-frontend
+```
+
+### 3. Instalar dependencias
+```bash
+npm install
+```
+
+### 4. Configurar variables de entorno
+Editar `src/environments/environment.ts`:
+
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api'
+};
+```
+
+---
+
+## ▶️ Ejecución
+
+### Servidor de Desarrollo
 ```bash
 ng serve
 ```
+Accede en:  
+**http://localhost:4200/**
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
+### Build de Producción
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 🧪 Credenciales de Prueba (Dev Mode)
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Si usas la base de datos local con *seeders* cargados:
 
-```bash
-ng test
-```
+| Rol            | Email               | Password | Panel |
+|----------------|---------------------|----------|--------|
+| Super Admin    | admin@admin.cl      | 123456   | `/platform` (Layout Dorado) |
+| Tenant Owner   | tienda1@tienda.cl   | 123456   | `/admin` (Layout Ámbar) |
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 📝 Notas para Desarrolladores
 
-```bash
-ng e2e
-```
+- **Tailwind v4:** Si VS Code muestra advertencias, actualiza la extensión *Tailwind IntelliSense*.  
+- **Kill Switch:** Al desactivar un tenant, el acceso del usuario se bloquea inmediatamente (retorna 401).  
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+© 2025 **SimpleShop SaaS** — Frontend Multi-Tenant
