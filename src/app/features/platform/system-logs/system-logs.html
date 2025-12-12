@@ -1,0 +1,164 @@
+<div class="animate-enter h-full flex flex-col gap-4">
+  
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+    <div>
+      <h1 class="text-2xl font-bold text-white tracking-tight">Centro de Operaciones</h1>
+      <p class="text-white/40 text-sm mt-1 uppercase tracking-widest">Monitoreo y Análisis de Riesgos</p>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <button (click)="exportToCsv()" class="btn-secondary py-2 px-4 text-xs flex items-center gap-2 group">
+        <svg class="w-4 h-4 text-green-500 group-hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        <span>Exportar CSV</span>
+      </button>
+      <button (click)="loadLogs()" class="btn-secondary py-2 px-4 text-xs flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        Refrescar
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0 h-40">
+    
+    <div class="bg-neutral-950 border border-white/10 rounded-xl p-4 flex items-center justify-center relative">
+      <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span class="text-3xl font-bold text-white">{{ stats().total }}</span>
+        <span class="text-[10px] text-white/40 uppercase tracking-widest">Eventos</span>
+      </div>
+
+      <svg viewBox="0 0 36 36" class="w-32 h-32 transform -rotate-90">
+        <path class="text-white/5" 
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+              fill="none" stroke="currentColor" stroke-width="3" />
+        
+        <path class="text-red-500 transition-all duration-1000 ease-out" 
+              [attr.stroke-dasharray]="chartData().error" 
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+              fill="none" stroke="currentColor" stroke-width="3" />
+
+        <path class="text-purple-500 transition-all duration-1000 ease-out" 
+              [attr.stroke-dasharray]="chartData().security" 
+              [attr.stroke-dashoffset]="chartData().offSecurity"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+              fill="none" stroke="currentColor" stroke-width="3" />
+
+        <path class="text-yellow-500 transition-all duration-1000 ease-out" 
+              [attr.stroke-dasharray]="chartData().warn" 
+              [attr.stroke-dashoffset]="chartData().offWarn"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+              fill="none" stroke="currentColor" stroke-width="3" />
+      </svg>
+    </div>
+
+    <div class="bg-neutral-950 border border-white/10 rounded-xl p-6 flex flex-col justify-center items-start">
+      <h3 class="text-white/40 text-xs font-bold uppercase tracking-widest mb-2">Estado del Sistema</h3>
+      
+      <div class="flex items-center gap-3 mb-1">
+        <div class="h-3 w-3 rounded-full animate-pulse" [class]="systemStatus().bg">
+          <div class="h-full w-full rounded-full" [class]="systemStatus().bg"></div>
+        </div>
+        <span class="text-3xl font-bold tracking-tight" [class]="systemStatus().color">{{ systemStatus().text }}</span>
+      </div>
+      
+      <p class="text-white/30 text-xs mt-2">
+        @if(systemStatus().text === 'OPERATIVO') {
+          Todos los sistemas funcionan nominalmente.
+        } @else if(systemStatus().text === 'CRÍTICO') {
+          Se requieren acciones correctivas inmediatas.
+        } @else {
+          Monitoreo activo recomendado.
+        }
+      </p>
+    </div>
+
+    <div class="bg-neutral-950 border border-white/10 rounded-xl p-4 flex flex-col justify-center gap-3">
+      
+      <div class="flex items-center justify-between group cursor-default">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-red-500"></div>
+          <span class="text-white/60 text-sm group-hover:text-white transition-colors">Errores Críticos</span>
+        </div>
+        <span class="font-mono text-white font-bold">{{ stats().errors }}</span>
+      </div>
+
+      <div class="flex items-center justify-between group cursor-default">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+          <span class="text-white/60 text-sm group-hover:text-white transition-colors">Seguridad</span>
+        </div>
+        <span class="font-mono text-white font-bold">{{ stats().security }}</span>
+      </div>
+
+      <div class="flex items-center justify-between group cursor-default">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+          <span class="text-white/60 text-sm group-hover:text-white transition-colors">Advertencias</span>
+        </div>
+        <span class="font-mono text-white font-bold">{{ stats().warnings }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="flex flex-col md:flex-row gap-4 shrink-0">
+    <div class="relative flex-1">
+      <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar trace, usuario o mensaje..." class="w-full bg-neutral-950 border border-white/10 rounded px-4 py-2 pl-10 text-xs text-white focus:border-brand-primary focus:outline-none transition-colors">
+      <svg class="w-3 h-3 text-white/30 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    </div>
+    <div class="flex bg-neutral-950 border border-white/10 rounded p-1">
+      <button (click)="filterLevel.set('ALL')" [class.bg-white/10]="filterLevel() === 'ALL'" [class.text-white]="filterLevel() === 'ALL'" class="px-3 py-1 text-[10px] font-bold text-white/40 hover:text-white rounded transition-colors">ALL</button>
+      <button (click)="filterLevel.set('SECURITY')" [class.bg-purple-500/20]="filterLevel() === 'SECURITY'" [class.text-purple-400]="filterLevel() === 'SECURITY'" class="px-3 py-1 text-[10px] font-bold text-white/40 hover:text-purple-400 rounded transition-colors">SEC</button>
+      <button (click)="filterLevel.set('ERROR')" [class.bg-red-500/20]="filterLevel() === 'ERROR'" [class.text-red-400]="filterLevel() === 'ERROR'" class="px-3 py-1 text-[10px] font-bold text-white/40 hover:text-red-400 rounded transition-colors">ERR</button>
+      <button (click)="filterLevel.set('WARN')" [class.bg-yellow-500/20]="filterLevel() === 'WARN'" [class.text-yellow-400]="filterLevel() === 'WARN'" class="px-3 py-1 text-[10px] font-bold text-white/40 hover:text-yellow-400 rounded transition-colors">WARN</button>
+    </div>
+  </div>
+
+  <div class="bg-neutral-950 border border-white/10 rounded-xl overflow-hidden shadow-2xl font-mono text-sm flex flex-col h-[calc(100vh-420px)] w-full">
+    <div class="bg-white/5 px-4 py-2 border-b border-white/5 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+        <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+        <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+        <span class="text-xs text-white/30 ml-3">system_audit.log</span>
+      </div>
+      <div class="text-[10px] text-white/20">
+        {{ filteredLogs().length }} / {{ logs().length }} EVENTS
+      </div>
+    </div>
+
+    <div class="flex-1 min-h-0 overflow-y-auto p-4 space-y-1 custom-scrollbar scroll-smooth">
+      @if (isLoading()) {
+        <div class="text-brand-primary animate-pulse py-4">> Analizando datos...</div>
+      }
+      @for (log of filteredLogs(); track log.id) {
+        <div class="group flex items-start gap-3 p-1.5 rounded transition-colors hover:bg-white/5 border-l-2 border-transparent"
+             [class.border-l-blue-500]="log.level === 'INFO'"
+             [class.border-l-yellow-500]="log.level === 'WARN'"
+             [class.border-l-red-500]="log.level === 'ERROR'"
+             [class.border-l-purple-500]="log.level === 'SECURITY'"
+             [class.border-l-cyan-500]="log.level === 'AUDIT'">
+          <span class="text-white/30 text-[10px] whitespace-nowrap pt-0.5 w-24 select-none">{{ log.createdAt | date:'MM/dd HH:mm:ss' }}</span>
+          <span class="text-[10px] font-bold px-1.5 rounded uppercase tracking-wider w-16 text-center shrink-0 select-none"
+                [class.text-blue-400]="log.level === 'INFO'" [class.bg-blue-400/10]="log.level === 'INFO'"
+                [class.text-yellow-400]="log.level === 'WARN'" [class.bg-yellow-400/10]="log.level === 'WARN'"
+                [class.text-red-400]="log.level === 'ERROR'" [class.bg-red-400/10]="log.level === 'ERROR'"
+                [class.text-purple-400]="log.level === 'SECURITY'" [class.bg-purple-400/10]="log.level === 'SECURITY'"
+                [class.text-cyan-400]="log.level === 'AUDIT'" [class.bg-cyan-400/10]="log.level === 'AUDIT'">
+            {{ log.level }}
+          </span>
+          <div class="flex-1 break-all">
+            <span class="text-white/50 font-bold mr-2">[{{ log.action }}]</span>
+            <span class="text-white/90">{{ log.message }}</span>
+            @if (log.userEmail) { <span class="text-white/20 text-xs ml-2 select-none">by {{ log.userEmail }}</span> }
+          </div>
+        </div>
+      }
+      @if (filteredLogs().length === 0 && !isLoading()) {
+        <div class="text-white/20 italic text-center py-20 flex flex-col items-center">
+          <svg class="w-12 h-12 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          Sin resultados.
+        </div>
+      }
+    </div>
+  </div>
+</div>

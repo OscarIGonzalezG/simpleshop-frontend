@@ -1,1 +1,100 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+@theme {
+  /* --- COLORES: NOIR LUXURY --- */
+  
+  /* Fondos: Oscuros pero cálidos */
+  --color-noir-bg: #0a0a0a;       
+  --color-noir-surface: #171717;  
+  --color-noir-border: #404040;
+  
+  /* Acentos: Ámbar / Oro Viejo / Bronce */
+  --color-brand-primary: #F59E0B;  /* Ámbar */
+  --color-brand-hover: #D97706;    /* Bronce */
+  --color-brand-glow: rgba(245, 158, 11, 0.5); /* Glow dorado */
+  
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  --radius-card: 12px;
+  --radius-btn: 4px;
+}
+
+body {
+  background-color: var(--color-noir-bg);
+  color: #e5e5e5;
+  font-family: var(--font-body);
+  /* Textura de ruido */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* --- UTILIDADES PERSONALIZADAS --- */
+@layer utilities {
+  
+  /* Efecto Vidrio Ahumado */
+  .glass-panel {
+    background: rgba(23, 23, 23, 0.7);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 4px 30px rgba(0, 0, 0, 0.5),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  
+  /* --- SCROLLBAR "INDUSTRIAL" (VISIBLE) --- */
+  
+  /* Ancho de la barra */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* El riel (Track): Ligeramente más claro que el fondo para que se note el camino */
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.05); 
+    border-radius: 4px;
+  }
+
+  /* La barra móvil (Thumb): Gris visible por defecto */
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #525252; 
+    border-radius: 4px;
+    border: 2px solid #0a0a0a; /* Margen interno */
+  }
+
+  /* Hover: SE ENCIENDE EN ÁMBAR */
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-brand-primary); 
+    box-shadow: 0 0 10px var(--color-brand-glow);
+  }
+
+  /* Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #525252 rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* --- COMPONENTES --- */
+@layer components {
+  .btn-primary {
+    @apply bg-brand-primary text-black font-bold px-6 py-3 
+           rounded-(--radius-btn) tracking-widest uppercase text-xs
+           hover:bg-brand-hover hover:shadow-[0_0_20px_var(--color-brand-glow)]
+           transition-all duration-300 cursor-pointer flex items-center justify-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-white/20 text-white font-bold px-6 py-3 
+           rounded-(--radius-btn) tracking-widest uppercase text-xs
+           hover:border-brand-primary hover:text-brand-primary
+           transition-all duration-300 cursor-pointer;
+  }
+  
+  .input-noir {
+    @apply w-full bg-black/50 border border-white/10 px-4 py-3 
+           rounded-(--radius-btn) text-white placeholder-white/20
+           focus:outline-none focus:border-brand-primary focus:bg-black
+           transition-all duration-300;
+  }
+}

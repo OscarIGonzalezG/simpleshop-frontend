@@ -1,0 +1,40 @@
+<nav class="fixed w-full top-0 z-50 border-b border-white/5 bg-noir-bg/80 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <div class="flex items-center gap-2 cursor-pointer group" routerLink="/">
+        <div class="w-8 h-8 bg-brand-primary text-black rounded flex items-center justify-center font-bold">S</div>
+        <span class="font-display font-bold text-xl tracking-tight text-white">
+          SimpleShop<span class="text-brand-primary">.</span>
+        </span>
+      </div>
+
+      <div class="hidden md:flex items-center gap-8">
+        <a routerLink="/login" class="text-xs font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors cursor-pointer">
+          Ingresar
+        </a>
+        <a routerLink="/register" class="btn-primary py-2 px-5 text-[10px]">
+          Prueba Gratis
+        </a>
+      </div>
+
+      <div class="md:hidden">
+        <button (click)="toggleMenu()" class="text-white/70 hover:text-brand-primary">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             @if (!isMobileMenuOpen()) { <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/> }
+             @else { <path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round"/> }
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (isMobileMenuOpen()) {
+    <div class="md:hidden bg-noir-surface border-b border-white/10">
+      <div class="px-4 py-4 space-y-2">
+        <a routerLink="/login" (click)="toggleMenu()" class="block px-3 py-2 text-white font-medium hover:bg-white/5 rounded">Ingresar</a>
+        <a routerLink="/register" (click)="toggleMenu()" class="block w-full text-center btn-primary mt-4">Crear Tienda</a>
+      </div>
+    </div>
+  }
+</nav>

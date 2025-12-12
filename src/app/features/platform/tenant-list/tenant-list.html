@@ -1,0 +1,53 @@
+<div class="animate-enter">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-white tracking-tight">Tiendas Registradas</h1>
+      <p class="text-white/40 text-sm mt-1 uppercase tracking-widest">Gestión de Tenants</p>
+    </div>
+    <button (click)="loadData()" class="text-yellow-500 hover:text-white text-sm">↻ Refrescar</button>
+  </div>
+
+  <div class="bg-black border border-white/10 rounded-xl overflow-hidden">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-white/10 bg-white/5">
+          <th class="p-4 text-xs font-bold text-yellow-500 uppercase tracking-wider">Negocio</th>
+          <th class="p-4 text-xs font-bold text-yellow-500 uppercase tracking-wider">URL (Slug)</th>
+          <th class="p-4 text-xs font-bold text-yellow-500 uppercase tracking-wider text-center">Estado</th>
+          <th class="p-4 text-xs font-bold text-yellow-500 uppercase tracking-wider text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 text-sm">
+        @for (tenant of tenants(); track tenant.id) {
+          <tr class="hover:bg-white/5 transition-colors group">
+            <td class="p-4">
+              <div class="font-bold text-white">{{ tenant.businessName }}</div>
+              <div class="text-xs text-white/40 font-mono">{{ tenant.id.split('-')[0] }}...</div>
+            </td>
+            <td class="p-4 font-mono text-white/70">{{ tenant.slug }}</td>
+            <td class="p-4 text-center">
+              @if (tenant.isActive) {
+                <span class="bg-green-500/10 text-green-500 border border-green-500/20 px-2 py-1 rounded text-xs font-bold">ACTIVO</span>
+              } @else {
+                <span class="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 rounded text-xs font-bold">INACTIVO</span>
+              }
+            </td>
+            <td class="p-4 text-right">
+              <button (click)="toggleStatus(tenant)" 
+                class="text-xs font-bold uppercase tracking-wider transition-colors"
+                [class.text-red-400]="tenant.isActive"
+                [class.hover:text-red-300]="tenant.isActive"
+                [class.text-green-400]="!tenant.isActive"
+                [class.hover:text-green-300]="!tenant.isActive">
+                {{ tenant.isActive ? 'Desactivar' : 'Activar' }}
+              </button>
+            </td>
+          </tr>
+        }
+        @if (tenants().length === 0 && !isLoading()) {
+          <tr><td colspan="4" class="p-8 text-center text-white/30">No hay tiendas registradas.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

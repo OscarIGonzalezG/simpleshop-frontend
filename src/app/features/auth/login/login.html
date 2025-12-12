@@ -1,0 +1,45 @@
+<div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-brand-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+  <div class="glass-panel w-full max-w-md rounded-2xl p-10 relative animate-enter border-t border-white/10">
+    
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-brand-primary/10 border border-brand-primary/30 text-brand-primary mb-6">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+      </div>
+      
+      <h1 class="text-3xl font-bold text-white tracking-tight mb-2">Bienvenido</h1>
+      <p class="text-white/40 text-xs uppercase tracking-[0.2em]">Gestión de Inventario</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="mb-6 p-3 bg-red-900/20 border border-red-900/50 text-red-400 text-xs text-center rounded">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div class="space-y-1">
+        <label class="block text-[10px] font-bold uppercase text-white/50 tracking-widest ml-1">Email</label>
+        <input type="email" formControlName="email" class="input-noir" placeholder="admin@simpleshop.com">
+      </div>
+      
+      <div class="space-y-1">
+        <label class="block text-[10px] font-bold uppercase text-white/50 tracking-widest ml-1">Password</label>
+        <input type="password" formControlName="password" class="input-noir" placeholder="••••••••">
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid || isLoading()" class="btn-primary w-full shadow-lg shadow-brand-primary/20">
+        @if (isLoading()) { <span>Accediendo...</span> } @else { INGRESAR }
+      </button>
+    </form>
+
+    <div class="mt-8 text-center">
+      <a routerLink="/register" class="text-white/40 text-xs hover:text-brand-primary transition-colors border-b border-transparent hover:border-brand-primary pb-0.5 cursor-pointer">
+        Crear cuenta nueva
+      </a>
+    </div>
+  </div>
+</div>

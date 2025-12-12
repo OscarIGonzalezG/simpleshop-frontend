@@ -1,0 +1,58 @@
+<div class="animate-enter">
+  <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Vista Global</h1>
+  <p class="text-white/40 text-sm mb-8 uppercase tracking-widest">Métricas de rendimiento del SaaS</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    
+    <div class="p-6 rounded-xl bg-black border border-white/10 relative overflow-hidden group hover:border-yellow-600/50 transition-all">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <svg class="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+      </div>
+      <div class="text-yellow-500 font-bold text-xs uppercase tracking-widest mb-1">Tiendas Activas</div>
+      <div class="text-4xl font-bold text-white">{{ metrics().totalTenants }}</div>
+    </div>
+
+    <div class="p-6 rounded-xl bg-black border border-white/10 relative overflow-hidden group hover:border-yellow-600/50 transition-all">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <svg class="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+      </div>
+      <div class="text-blue-400 font-bold text-xs uppercase tracking-widest mb-1">Usuarios Totales</div>
+      <div class="text-4xl font-bold text-white">{{ metrics().totalUsers }}</div>
+    </div>
+
+    <div class="p-6 rounded-xl bg-black border border-white/10 relative overflow-hidden group hover:border-yellow-600/50 transition-all">
+      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <svg class="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+      <div class="text-green-500 font-bold text-xs uppercase tracking-widest mb-1">Ingresos Globales</div>
+      <div class="text-4xl font-bold text-white">$ {{ metrics().totalRevenue }}</div>
+    </div>
+  </div>
+
+  <h2 class="text-lg font-bold text-white mb-4">Últimas Tiendas Creadas</h2>
+  <div class="bg-black border border-white/10 rounded-xl overflow-hidden">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-white/10 bg-white/5">
+          <th class="p-4 text-xs font-bold text-white/40 uppercase">Nombre</th>
+          <th class="p-4 text-xs font-bold text-white/40 uppercase">Slug</th>
+          <th class="p-4 text-xs font-bold text-white/40 uppercase">Plan</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 text-sm text-white/70">
+        @for (tenant of metrics().recentTenants; track tenant.id) {
+          <tr>
+            <td class="p-4 font-bold text-white">{{ tenant.businessName }}</td>
+            <td class="p-4 font-mono text-yellow-600">{{ tenant.slug }}</td>
+            <td class="p-4"><span class="bg-white/10 px-2 py-1 rounded text-xs">FREE</span></td>
+          </tr>
+        }
+        @if (metrics().recentTenants.length === 0) {
+          <tr>
+            <td colspan="3" class="p-8 text-center text-white/30 italic">No hay actividad reciente.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

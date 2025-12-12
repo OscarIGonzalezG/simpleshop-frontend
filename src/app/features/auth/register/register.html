@@ -1,0 +1,78 @@
+<div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden py-10">
+
+  <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+
+  <div class="glass-panel w-full max-w-lg rounded-2xl p-8 md:p-10 relative animate-enter border-t border-white/10">
+    
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-10 h-10 rounded bg-brand-primary/10 border border-brand-primary/20 text-brand-primary mb-4">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      </div>
+      <h1 class="text-3xl font-bold text-white tracking-tight mb-2">Crear Cuenta</h1>
+      <p class="text-white/40 text-xs uppercase tracking-[0.2em]">Comienza tu prueba gratuita</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="mb-6 p-3 bg-red-900/20 border border-red-900/50 text-red-400 text-xs text-center rounded animate-slide-up">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      
+      <div class="space-y-1">
+        <label class="block text-[10px] font-bold uppercase text-white/50 tracking-widest ml-1">Tu Nombre</label>
+        <input type="text" formControlName="fullname" class="input-noir" placeholder="Ej: Juan Pérez">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-[10px] font-bold uppercase text-white/50 tracking-widest ml-1">Correo Profesional</label>
+        <input type="email" formControlName="email" class="input-noir" placeholder="contacto@tuempresa.com">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-[10px] font-bold uppercase text-white/50 tracking-widest ml-1">Nombre de tu Tienda</label>
+        <input 
+          type="text" 
+          formControlName="businessName" 
+          (input)="onBusinessNameChange()" 
+          class="input-noir" 
+          placeholder="Ej: Tienda Industrial">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-[10px] font-bold uppercase text-white/50 tracking-widest ml-1">
+          URL Personalizada <span class="text-brand-primary/50 normal-case tracking-normal">(simpleshop.com/store/...)</span>
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            formControlName="slug" 
+            class="input-noir pl-4 font-mono text-brand-primary" 
+            placeholder="tienda-industrial">
+        </div>
+        @if (registerForm.get('slug')?.invalid && registerForm.get('slug')?.touched) {
+          <span class="text-[10px] text-red-400 ml-1">Solo letras minúsculas, números y guiones.</span>
+        }
+      </div>
+      
+      <div class="space-y-1">
+        <label class="block text-[10px] font-bold uppercase text-white/50 tracking-widest ml-1">Contraseña</label>
+        <input type="password" formControlName="password" class="input-noir" placeholder="Mínimo 6 caracteres">
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid || isLoading()" class="btn-primary w-full shadow-lg shadow-brand-primary/10 mt-6">
+        @if (isLoading()) { <span>Configurando Tienda...</span> } @else { LANZAR MI NEGOCIO }
+      </button>
+
+    </form>
+
+    <div class="mt-8 text-center border-t border-white/5 pt-6">
+      <p class="text-white/40 text-xs mb-2">¿Ya tienes una cuenta?</p>
+      <a routerLink="/login" class="text-brand-primary text-xs font-bold hover:text-white transition-colors cursor-pointer uppercase tracking-wider">
+        Ingresar al Panel
+      </a>
+    </div>
+
+  </div>
+</div>
