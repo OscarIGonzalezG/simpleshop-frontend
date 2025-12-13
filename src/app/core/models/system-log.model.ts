@@ -6,5 +6,6 @@ export interface SystemLog {
   userEmail?: string;
   tenantId?: string;
   metadata?: any;
-  createdAt: string; // Viene como ISO String
+  createdAt: string | Date; // Viene como ISO String
+  payload?: any;
 }

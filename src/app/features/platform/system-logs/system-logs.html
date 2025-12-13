@@ -7,10 +7,20 @@
     </div>
     
     <div class="flex items-center gap-3">
-      <button (click)="exportToCsv()" class="btn-secondary py-2 px-4 text-xs flex items-center gap-2 group">
-        <svg class="w-4 h-4 text-green-500 group-hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        <span>Exportar CSV</span>
+      <button (click)="exportToCsv()" 
+              class="btn-secondary py-2 px-4 text-xs flex items-center gap-2 group transition-all"
+              [class.border-green-500]="filterLevel() === 'ALL'"
+              [class.text-green-500]="filterLevel() === 'ALL'"
+              [class.border-red-500]="filterLevel() === 'ERROR'"
+              [class.text-red-400]="filterLevel() === 'ERROR'"
+              [class.border-purple-500]="filterLevel() === 'SECURITY'"
+              [class.text-purple-400]="filterLevel() === 'SECURITY'"
+              [class.border-yellow-500]="filterLevel() === 'WARN'"
+              [class.text-yellow-400]="filterLevel() === 'WARN'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        <span class="font-bold">Exportar {{ filterLevel() === 'ALL' ? 'Todo' : filterLevel() }}</span>
       </button>
+
       <button (click)="loadLogs()" class="btn-secondary py-2 px-4 text-xs flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         Refrescar
@@ -18,91 +28,55 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0 h-40">
-    
-    <div class="bg-neutral-950 border border-white/10 rounded-xl p-4 flex items-center justify-center relative">
-      <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <span class="text-3xl font-bold text-white">{{ stats().total }}</span>
-        <span class="text-[10px] text-white/40 uppercase tracking-widest">Eventos</span>
-      </div>
-
-      <svg viewBox="0 0 36 36" class="w-32 h-32 transform -rotate-90">
-        <path class="text-white/5" 
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-              fill="none" stroke="currentColor" stroke-width="3" />
-        
-        <path class="text-red-500 transition-all duration-1000 ease-out" 
-              [attr.stroke-dasharray]="chartData().error" 
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-              fill="none" stroke="currentColor" stroke-width="3" />
-
-        <path class="text-purple-500 transition-all duration-1000 ease-out" 
-              [attr.stroke-dasharray]="chartData().security" 
-              [attr.stroke-dashoffset]="chartData().offSecurity"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-              fill="none" stroke="currentColor" stroke-width="3" />
-
-        <path class="text-yellow-500 transition-all duration-1000 ease-out" 
-              [attr.stroke-dasharray]="chartData().warn" 
-              [attr.stroke-dashoffset]="chartData().offWarn"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-              fill="none" stroke="currentColor" stroke-width="3" />
-      </svg>
-    </div>
-
-    <div class="bg-neutral-950 border border-white/10 rounded-xl p-6 flex flex-col justify-center items-start">
-      <h3 class="text-white/40 text-xs font-bold uppercase tracking-widest mb-2">Estado del Sistema</h3>
-      
-      <div class="flex items-center gap-3 mb-1">
-        <div class="h-3 w-3 rounded-full animate-pulse" [class]="systemStatus().bg">
-          <div class="h-full w-full rounded-full" [class]="systemStatus().bg"></div>
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 shrink-0 h-32">
+    <div class="lg:col-span-2 bg-neutral-950 border border-white/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
+      <div class="relative z-10 flex justify-between items-start">
+        <div>
+          <span class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Actividad Reciente</span>
+          <div class="text-3xl font-mono text-white mt-1">{{ stats().total }} <span class="text-sm text-white/30">eventos</span></div>
         </div>
-        <span class="text-3xl font-bold tracking-tight" [class]="systemStatus().color">{{ systemStatus().text }}</span>
-      </div>
-      
-      <p class="text-white/30 text-xs mt-2">
-        @if(systemStatus().text === 'OPERATIVO') {
-          Todos los sistemas funcionan nominalmente.
-        } @else if(systemStatus().text === 'CRÍTICO') {
-          Se requieren acciones correctivas inmediatas.
-        } @else {
-          Monitoreo activo recomendado.
-        }
-      </p>
-    </div>
-
-    <div class="bg-neutral-950 border border-white/10 rounded-xl p-4 flex flex-col justify-center gap-3">
-      
-      <div class="flex items-center justify-between group cursor-default">
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-red-500"></div>
-          <span class="text-white/60 text-sm group-hover:text-white transition-colors">Errores Críticos</span>
+        <div class="flex items-center gap-2 px-2 py-1 rounded bg-white/5 border border-white/10">
+          <div class="w-2 h-2 rounded-full" [class.bg-red-500]="stats().errors > 0" [class.bg-green-500]="stats().errors === 0"></div>
+          <span class="text-[10px] text-white/60 uppercase">{{ stats().errors > 0 ? 'Atención' : 'Nominal' }}</span>
         </div>
-        <span class="font-mono text-white font-bold">{{ stats().errors }}</span>
       </div>
-
-      <div class="flex items-center justify-between group cursor-default">
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-purple-500"></div>
-          <span class="text-white/60 text-sm group-hover:text-white transition-colors">Seguridad</span>
-        </div>
-        <span class="font-mono text-white font-bold">{{ stats().security }}</span>
-      </div>
-
-      <div class="flex items-center justify-between group cursor-default">
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-          <span class="text-white/60 text-sm group-hover:text-white transition-colors">Advertencias</span>
-        </div>
-        <span class="font-mono text-white font-bold">{{ stats().warnings }}</span>
+      <div class="absolute bottom-0 left-0 right-0 h-16 opacity-30 pointer-events-none">
+        <svg viewBox="0 0 100 50" preserveAspectRatio="none" class="w-full h-full">
+          <defs>
+            <linearGradient id="spikeGradient" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polyline [attr.points]="trendChart()" fill="none" stroke="#F59E0B" stroke-width="2" vector-effect="non-scaling-stroke" />
+        </svg>
       </div>
     </div>
 
+    <div class="bg-neutral-950 border border-purple-500/30 rounded-xl p-4 flex flex-col justify-center">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="p-1.5 rounded bg-purple-500/10 text-purple-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+        <span class="text-purple-400/60 text-[10px] font-bold uppercase tracking-wider">Seguridad</span>
+      </div>
+      <span class="text-2xl font-mono text-purple-400">{{ stats().security }}</span>
+    </div>
+
+    <div class="bg-neutral-950 border border-red-500/30 rounded-xl p-4 flex flex-col justify-center">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="p-1.5 rounded bg-red-500/10 text-red-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <span class="text-red-400/60 text-[10px] font-bold uppercase tracking-wider">Errores</span>
+      </div>
+      <span class="text-2xl font-mono text-red-400">{{ stats().errors }}</span>
+    </div>
   </div>
 
   <div class="flex flex-col md:flex-row gap-4 shrink-0">
     <div class="relative flex-1">
-      <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar trace, usuario o mensaje..." class="w-full bg-neutral-950 border border-white/10 rounded px-4 py-2 pl-10 text-xs text-white focus:border-brand-primary focus:outline-none transition-colors">
+      <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar..." class="w-full bg-neutral-950 border border-white/10 rounded px-4 py-2 pl-10 text-xs text-white focus:border-brand-primary focus:outline-none transition-colors">
       <svg class="w-3 h-3 text-white/30 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
     </div>
     <div class="flex bg-neutral-950 border border-white/10 rounded p-1">
@@ -113,51 +87,125 @@
     </div>
   </div>
 
-  <div class="bg-neutral-950 border border-white/10 rounded-xl overflow-hidden shadow-2xl font-mono text-sm flex flex-col h-[calc(100vh-420px)] w-full">
+  <div class="bg-neutral-950 border border-white/10 rounded-xl overflow-hidden shadow-2xl font-mono text-sm flex flex-col h-[calc(100vh-320px)] w-full">
     <div class="bg-white/5 px-4 py-2 border-b border-white/5 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-2">
         <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
         <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
         <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
-        <span class="text-xs text-white/30 ml-3">system_audit.log</span>
+        <span class="text-xs text-white/30 ml-3">live_grouped.log</span>
       </div>
-      <div class="text-[10px] text-white/20">
-        {{ filteredLogs().length }} / {{ logs().length }} EVENTS
-      </div>
+      <div class="text-[10px] text-white/20 uppercase tracking-wider">Agrupación Inteligente Activa</div>
     </div>
 
     <div class="flex-1 min-h-0 overflow-y-auto p-4 space-y-1 custom-scrollbar scroll-smooth">
-      @if (isLoading()) {
-        <div class="text-brand-primary animate-pulse py-4">> Analizando datos...</div>
-      }
-      @for (log of filteredLogs(); track log.id) {
-        <div class="group flex items-start gap-3 p-1.5 rounded transition-colors hover:bg-white/5 border-l-2 border-transparent"
-             [class.border-l-blue-500]="log.level === 'INFO'"
-             [class.border-l-yellow-500]="log.level === 'WARN'"
-             [class.border-l-red-500]="log.level === 'ERROR'"
-             [class.border-l-purple-500]="log.level === 'SECURITY'"
-             [class.border-l-cyan-500]="log.level === 'AUDIT'">
-          <span class="text-white/30 text-[10px] whitespace-nowrap pt-0.5 w-24 select-none">{{ log.createdAt | date:'MM/dd HH:mm:ss' }}</span>
-          <span class="text-[10px] font-bold px-1.5 rounded uppercase tracking-wider w-16 text-center shrink-0 select-none"
-                [class.text-blue-400]="log.level === 'INFO'" [class.bg-blue-400/10]="log.level === 'INFO'"
-                [class.text-yellow-400]="log.level === 'WARN'" [class.bg-yellow-400/10]="log.level === 'WARN'"
-                [class.text-red-400]="log.level === 'ERROR'" [class.bg-red-400/10]="log.level === 'ERROR'"
-                [class.text-purple-400]="log.level === 'SECURITY'" [class.bg-purple-400/10]="log.level === 'SECURITY'"
-                [class.text-cyan-400]="log.level === 'AUDIT'" [class.bg-cyan-400/10]="log.level === 'AUDIT'">
-            {{ log.level }}
-          </span>
-          <div class="flex-1 break-all">
-            <span class="text-white/50 font-bold mr-2">[{{ log.action }}]</span>
-            <span class="text-white/90">{{ log.message }}</span>
-            @if (log.userEmail) { <span class="text-white/20 text-xs ml-2 select-none">by {{ log.userEmail }}</span> }
+      @if (isLoading()) { <div class="text-brand-primary animate-pulse py-4">> Analizando datos...</div> }
+
+      @for (log of groupedLogs(); track log.key) {
+        <div class="flex flex-col border-b border-white/5 last:border-0 transition-colors hover:bg-white/5">
+          
+          <div (click)="toggleDetails(log.key)" class="flex items-center gap-3 p-3 cursor-pointer group">
+            @if (log.count > 1) { 
+              <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-6 text-center shadow-[0_0_10px_rgba(239,68,68,0.5)]">x{{ log.count }}</span> 
+            } @else { <span class="w-6"></span> }
+            
+            <span class="text-white/30 text-[10px] w-16 text-right">{{ log.lastSeen | date:'HH:mm' }}</span>
+            
+            <span class="text-[10px] font-bold px-1.5 rounded uppercase w-16 text-center shrink-0"
+                  [class.text-blue-400]="log.level === 'INFO'" [class.bg-blue-400/10]="log.level === 'INFO'"
+                  [class.text-yellow-400]="log.level === 'WARN'" [class.bg-yellow-400/10]="log.level === 'WARN'"
+                  [class.text-red-400]="log.level === 'ERROR'" [class.bg-red-400/10]="log.level === 'ERROR'"
+                  [class.text-purple-400]="log.level === 'SECURITY'" [class.bg-purple-400/10]="log.level === 'SECURITY'"
+                  [class.text-cyan-400]="log.level === 'AUDIT'" [class.bg-cyan-400/10]="log.level === 'AUDIT'">{{ log.level }}</span>
+            
+            <div class="flex-1 min-w-0 flex flex-col">
+              <div class="flex items-baseline gap-2">
+                <span class="text-white/50 font-bold text-xs">[{{ log.action }}]</span>
+                <span class="text-white/90 text-sm truncate">{{ log.message }}</span>
+              </div>
+            </div>
+            
+            <svg class="w-4 h-4 text-white/20 transition-transform duration-300" [class.rotate-180]="expandedLogKey() === log.key" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
           </div>
+
+          @if (expandedLogKey() === log.key) {
+            <div class="bg-black/40 p-4 pl-14 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-6 animate-enter">
+              
+              <div class="flex flex-col gap-4">
+                <div>
+                  <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-2 font-bold flex items-center gap-2">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    Datos Técnicos (Evento Seleccionado)
+                  </h4>
+                    <div class="bg-neutral-900 border border-white/10 rounded p-4 font-mono text-xs text-green-400/90 overflow-x-auto whitespace-pre-wrap max-h-96 custom-scrollbar shadow-inner">
+                      {{ log.payload ? (log.payload | json) : '// No data captured' }}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                   @if (log.tenantId) {
+                    <button (click)="navigateToContext(log); $event.stopPropagation()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded py-2 px-3 text-[10px] text-white flex items-center gap-2 transition-colors cursor-pointer">
+                      <svg class="w-4 h-4 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                      Ir a la Tienda ({{ log.tenantId }})
+                    </button>
+                  }
+                  @if (log.userEmail) {
+                    <button (click)="navigateToContext(log); $event.stopPropagation()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded py-2 px-3 text-[10px] text-white flex items-center gap-2 transition-colors cursor-pointer">
+                      <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                      Ir al Usuario ({{ log.userEmail }})
+                    </button>
+                  }
+                  <button class="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded py-2 px-3 text-[10px] text-red-400 flex items-center gap-2 transition-colors cursor-pointer">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                      Reportar Incidente
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-col h-full min-h-[200px]">
+                <h4 class="text-[10px] uppercase tracking-widest text-white/40 mb-2 font-bold flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-3 h-3 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Historial de Eventos
+                  </div>
+                  <span class="bg-white/10 text-white px-1.5 py-0.5 rounded text-[9px] font-mono">{{ log.history.length }} ocurrencias</span>
+                </h4>
+                
+                <div class="flex-1 bg-neutral-900/50 border border-white/10 rounded overflow-hidden flex flex-col">
+                  <div class="grid grid-cols-12 gap-2 p-2 bg-white/5 border-b border-white/5 text-[9px] uppercase font-bold text-white/30">
+                    <div class="col-span-3">Hora</div>
+                    <div class="col-span-9">Usuario / Email</div>
+                  </div>
+
+                  <div class="overflow-y-auto custom-scrollbar flex-1 max-h-48 p-1">
+                    @for (item of log.history; track item.id) {
+                      <div (click)="selectLogFromHistory(log, item); $event.stopPropagation()" 
+                           class="grid grid-cols-12 gap-2 p-1.5 rounded transition-colors cursor-pointer border-l-2"
+                           [class.bg-white/10]="log.activeLogId === item.id"
+                           [class.hover:bg-white/10]="log.activeLogId !== item.id"
+                           [class.border-brand-primary]="log.activeLogId === item.id"
+                           [class.border-transparent]="log.activeLogId !== item.id">
+                           
+                        <div class="col-span-3 font-mono text-white/40 pointer-events-none">
+                          {{ item.createdAt | date:'HH:mm:ss' }}
+                        </div>
+                        <div class="col-span-9 truncate font-mono text-white/80 pointer-events-none" [title]="item.userEmail || 'Anónimo'">
+                          @if(item.userEmail) { <span class="text-blue-300">{{ item.userEmail }}</span> } 
+                          @else { <span class="text-white/20 italic">Anónimo</span> }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          }
         </div>
       }
-      @if (filteredLogs().length === 0 && !isLoading()) {
-        <div class="text-white/20 italic text-center py-20 flex flex-col items-center">
-          <svg class="w-12 h-12 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          Sin resultados.
-        </div>
+
+      @if (groupedLogs().length === 0 && !isLoading()) {
+        <div class="text-white/20 italic text-center py-20 flex flex-col items-center">Sin resultados.</div>
       }
     </div>
   </div>

@@ -17,28 +17,41 @@ export interface PlatformMetrics {
 export class PlatformService {
   private http = inject(HttpClient);
   
-  // ⚠️ NOTA: Esto ya es ".../api/platform"
-  private apiUrl = `${environment.apiUrl}/platform`;
+  // Base para cosas de plataforma (/api/platform)
+  private platformUrl = `${environment.apiUrl}/platform`;
+  
+  // Base para usuarios (/api/users) - 👈 CORRECCIÓN AQUÍ
+  private usersUrl = `${environment.apiUrl}/users`;
 
   getMetrics() {
-    return this.http.get<PlatformMetrics>(`${this.apiUrl}/metrics`);
+    return this.http.get<PlatformMetrics>(`${this.platformUrl}/metrics`);
   }
 
   getTenants() {
-    return this.http.get<Tenant[]>(`${this.apiUrl}/tenants`);
-  }
-
-  getUsers() {
-    return this.http.get<User[]>(`${this.apiUrl}/users`);
+    return this.http.get<Tenant[]>(`${this.platformUrl}/tenants`);
   }
 
   toggleTenant(id: string) {
-    return this.http.patch<Tenant>(`${this.apiUrl}/tenants/${id}/toggle`, {});
+    return this.http.patch<Tenant>(`${this.platformUrl}/tenants/${id}/toggle`, {});
   }
 
-  // 👇 AQUÍ ESTABA EL ERROR
   getLogs() {
-    // Como apiUrl ya tiene '/platform', solo agregamos '/logs'
-    return this.http.get<SystemLog[]>(`${this.apiUrl}/logs`);
+    return this.http.get<SystemLog[]>(`${this.platformUrl}/logs`);
+  }
+
+  // ==========================================
+  // 👇 RUTAS CORREGIDAS (Apuntan a UsersController)
+  // ==========================================
+
+  getUsers() {
+    // Antes: this.platformUrl + '/users' -> /api/platform/users (ERROR 404)
+    // Ahora: this.usersUrl -> /api/users (CORRECTO)
+    return this.http.get<User[]>(this.usersUrl);
+  }
+
+  toggleUserBlock(userId: string, isActive: boolean) {
+    // Antes: /api/platform/users/:id/status (ERROR 404)
+    // Ahora: /api/users/:id/status (CORRECTO)
+    return this.http.patch(`${this.usersUrl}/${userId}/status`, { isActive });
   }
 }

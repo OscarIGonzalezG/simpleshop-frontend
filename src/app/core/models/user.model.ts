@@ -11,6 +11,7 @@ export interface User {
   email: string;
   fullname: string;
   role?: string; // 'OWNER', 'ADMIN', 'STAFF', 'SUPER_ADMIN'
+  isActive: boolean;
   tenantId?: string;
   tenant?: Tenant; // Relación opcional
 }
