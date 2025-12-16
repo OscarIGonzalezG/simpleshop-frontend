@@ -134,28 +134,29 @@ export class SystemLogs implements OnInit {
       this.isLoading.set(true);
       this.platformService.getLogs().subscribe({
         next: (data) => {
-          // 1. TRUCO DE ZONA HORARIA Y TIPO DE DATO 🕒
           const parsedData = data.map(log => {
-            // Convertimos a string por seguridad
-            let dateStr = String(log.createdAt);
+            // 1. Creamos la fecha tal cual viene (probablemente 17:00)
+            const serverDate = new Date(log.createdAt);
             
-            // Si la fecha no termina en 'Z', se la agregamos.
-            // La 'Z' le dice al navegador: "Esto es Hora Universal (UTC)".
-            // Al ver la 'Z', el navegador restará automáticamente las 3 horas de Chile.
-            if (!dateStr.endsWith('Z')) {
-              dateStr += 'Z';
-            }
+            // 2. Calculamos la diferencia horaria de TU navegador (Ej: Chile = 180 min = 3 horas)
+            // getTimezoneOffset devuelve minutos positivos si estás al oeste de UTC.
+            const offsetMinutes = new Date().getTimezoneOffset(); 
+            
+            // 3. ☢️ AJUSTE MANUAL: Restamos la diferencia.
+            // Si el servidor dice 17:00 y tu offset es 3 horas: 17 - 3 = 14:00.
+            const localDate = new Date(serverDate.getTime() - (offsetMinutes * 60000));
 
             return {
               ...log,
-              createdAt: new Date(dateStr) // Ahora sí crea la fecha restando -3 horas
+              // Guardamos la fecha corregida
+              createdAt: localDate 
             };
           });
 
-          // 2. Ordenamos por fecha descendente
+          // Ordenamos
           parsedData.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-          // 3. FIX ERROR TYPESCRIPT: Usamos 'as any' para que deje de molestar por el tipo Date
+          // FIX TYPESCRIPT: Usamos 'as any' para evitar el error rojo
           this.logs.set(parsedData as any);
           
           this.isLoading.set(false);

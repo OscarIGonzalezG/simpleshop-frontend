@@ -58,9 +58,13 @@ export class Register {
     this.authService.register(formData).subscribe({
       next: () => {
         this.isLoading.set(false);
-        // Al registrarse exitosamente, el backend ya devuelve el token y lo guardamos.
-        // Redirigimos al Dashboard (futuro)
-        this.router.navigate(['/admin']); 
+        
+        // ✅ CAMBIO CRUCIAL AQUÍ:
+        // En lugar de ir al dashboard, vamos a la pantalla de verificación.
+        // Pasamos el email como "queryParams" para que el otro componente lo lea.
+        this.router.navigate(['/auth/verify'], { 
+          queryParams: { email: formData.email } 
+        });
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -73,5 +77,4 @@ export class Register {
       }
     });
   }
-
 }

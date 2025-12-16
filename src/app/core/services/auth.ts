@@ -14,52 +14,65 @@ export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  // 🧠 Signal tipada con 'User' (importado del modelo)
+  // 🧠 Signal tipada con 'User'
   currentUser = signal<User | null>(this.getUserFromStorage());
 
   constructor() {}
 
   // 🔐 LOGIN
   login(credentials: LoginDto) {
-    // Usamos AuthResponse en lugar de LoginResponse
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => this.saveSession(response))
     );
   }
 
-  // 📝 REGISTER (NUEVO)
+  // 📝 REGISTER
   register(data: RegisterDto) {
     // Si no viene plan, asignamos 'free' por defecto
     const payload = { ...data, plan: data.plan || 'free' };
     
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, payload).pipe(
-      tap((response) => this.saveSession(response))
+    // El backend no devuelve token aquí, solo mensaje.
+    return this.http.post<any>(`${this.apiUrl}/register`, payload);
+  }
+
+  // ✅ VERIFICAR CUENTA
+  verifyAccount(email: string, code: string) {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/verify`, { email, code }).pipe(
+      tap((response) => {
+        if (response.access_token) {
+          this.saveSession(response);
+        }
+      })
     );
   }
 
-  // 💾 Método privado para no repetir código (DRY)
+  // 👇👇👇 ESTA ES LA FUNCIÓN NUEVA QUE FALTABA 👇👇👇
+  resendCode(email: string) {
+    return this.http.post<any>(`${this.apiUrl}/resend`, { email });
+  }
+  // 👆👆👆
+
+  // 💾 Guardar sesión
   private saveSession(response: AuthResponse) {
     localStorage.setItem('token', response.access_token);
     localStorage.setItem('user', JSON.stringify(response.user));
-    
-    // Actualizamos la signal
     this.currentUser.set(response.user);
   }
 
-  // 🚪 LOGOUT
+  // 🚪 Logout
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUser.set(null);
   }
 
-  // 🔄 RECUPERAR USUARIO AL RECARGAR PÁGINA
+  // 🔄 Recuperar usuario
   private getUserFromStorage(): User | null {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   }
 
-  // ❓ ¿ESTÁ LOGUEADO?
+  // ❓ ¿Está logueado?
   get isLoggedIn() {
     return !!this.currentUser();
   }

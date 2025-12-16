@@ -10,10 +10,10 @@
       </div>
 
       <div class="hidden md:flex items-center gap-8">
-        <a routerLink="/login" class="text-xs font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors cursor-pointer">
+        <a routerLink="/auth/login" class="text-xs font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors cursor-pointer">
           Ingresar
         </a>
-        <a routerLink="/register" class="btn-primary py-2 px-5 text-[10px]">
+        <a routerLink="/auth/register" class="btn-primary py-2 px-5 text-[10px]">
           Prueba Gratis
         </a>
       </div>
@@ -32,8 +32,8 @@
   @if (isMobileMenuOpen()) {
     <div class="md:hidden bg-noir-surface border-b border-white/10">
       <div class="px-4 py-4 space-y-2">
-        <a routerLink="/login" (click)="toggleMenu()" class="block px-3 py-2 text-white font-medium hover:bg-white/5 rounded">Ingresar</a>
-        <a routerLink="/register" (click)="toggleMenu()" class="block w-full text-center btn-primary mt-4">Crear Tienda</a>
+        <a routerLink="/auth/login" (click)="toggleMenu()" class="block px-3 py-2 text-white font-medium hover:bg-white/5 rounded">Ingresar</a>
+        <a routerLink="/auth/register" (click)="toggleMenu()" class="block w-full text-center btn-primary mt-4">Crear Tienda</a>
       </div>
     </div>
   }

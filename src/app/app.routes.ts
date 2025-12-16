@@ -9,12 +9,15 @@ import { Dashboard as PlatformDashboard } from './features/platform/dashboard/da
 import { TenantList } from './features/platform/tenant-list/tenant-list';
 import { UserList } from './features/platform/user-list/user-list';
 import { SystemLogs } from './features/platform/system-logs/system-logs';
+import { VerifyEmail } from './features/auth/verify-email/verify-email';
 
 export const routes: Routes = [
 // Rutas Públicas
   { path: '', component: Landing },
-  { path: 'login', component: Login },
-  { path: 'register', component: Register },
+  { path: 'auth/login', component: Login },
+  { path: 'auth/register', component: Register },
+
+  { path: 'auth/verify', component: VerifyEmail },
 
   // Rutas Privadas (Admin)
   {

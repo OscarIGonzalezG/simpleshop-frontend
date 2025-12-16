@@ -12,7 +12,7 @@ import { AuthService } from '../../../core/services/auth';
   styleUrl: './login.css'      
 })
 export class Login {
-private fb = inject(FormBuilder);
+  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -37,24 +37,39 @@ private fb = inject(FormBuilder);
       next: () => {
         this.isLoading.set(false);
 
-        // 👇 LÓGICA DE REDIRECCIÓN INTELIGENTE
-        // Leemos el usuario actual desde la signal del servicio
         const user = this.authService.currentUser();
 
         if (user?.role === 'SUPER_ADMIN') {
-          // 👑 Es el Dueño del SaaS -> Panel de Plataforma
           console.log('👑 Super Admin detectado. Redirigiendo a Platform...');
           this.router.navigate(['/platform']);
         } else {
-          // 🏢 Es un Cliente (Tenant) -> Panel de Administración
           console.log('🏢 Usuario de tienda detectado. Redirigiendo a Admin...');
           this.router.navigate(['/admin']);
         }
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set('Credenciales incorrectas o error de conexión.');
-        console.error(err);
+        
+        console.log('🚨 Error recibido:', err.error); // Para depurar en consola
+
+        // 👇👇 LÓGICA BLINDADA 👇👇
+        // 1. Revisamos si viene el código 'ACCOUNT_NOT_VERIFIED'
+        // 2. O SI el mensaje contiene la palabra "verificar" (por si el GlobalFilter borró el código)
+        const errorCode = err.error?.code;
+        const errorMessage = err.error?.message || '';
+
+        if (errorCode === 'ACCOUNT_NOT_VERIFIED' || errorMessage.toLowerCase().includes('verificar')) {
+             console.log('⚠️ Cuenta no verificada. Redirigiendo a validación...');
+             
+             // Redirigimos pasando el email
+             this.router.navigate(['/auth/verify'], { 
+                 queryParams: { email: email } 
+             });
+             return; 
+        }
+
+        // Si es otro error, mostramos mensaje
+        this.errorMessage.set(errorMessage || 'Credenciales incorrectas o error de conexión.');
       }
     });
   }
