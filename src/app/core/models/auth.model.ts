@@ -11,9 +11,9 @@ export interface RegisterDto {
   fullname: string;
   email: string;
   password: string;
-  businessName: string;
-  slug: string;
-  plan?: string;
+  // businessName: string;
+  // slug: string;
+  // plan?: string;
 }
 
 // 📡 Lo que el Backend nos responde (Token + Datos)

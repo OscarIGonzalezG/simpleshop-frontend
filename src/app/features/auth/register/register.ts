@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { RegisterDto } from '../../../core/models/auth.model'; //
@@ -20,27 +20,28 @@ export class Register {
   isLoading = signal(false);
   errorMessage = signal('');
 
+  // 👇 NUEVO: Control de visibilidad de contraseñas
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
+
+  // 👇 FORMULARIO ACTUALIZADO
   registerForm = this.fb.group({
     fullname: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    businessName: ['', [Validators.required]],
-    slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]] 
-  });
+    confirmPassword: ['', [Validators.required]] // Campo nuevo
+  }, { validators: this.passwordMatchValidator }); // 👈 Validador de grupo
 
-  // 🪄 Magia: Generar slug automáticamente al escribir el nombre del negocio
-  onBusinessNameChange() {
-    const businessName = this.registerForm.get('businessName')?.value || '';
-    
-    // Convertir "Mi Tienda 123" -> "mi-tienda-123"
-    const slug = businessName
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '') // Quitar caracteres raros
-      .replace(/\s+/g, '-');        // Espacios por guiones
+  // 👇 VALIDACIÓN PERSONALIZADA
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
 
-    // Actualizamos el campo slug
-    this.registerForm.patchValue({ slug });
+    // Si no coinciden y ambos tienen valor, devolvemos error
+    if (password && confirmPassword && password !== confirmPassword) {
+      return { mismatch: true };
+    }
+    return null;
   }
 
   onSubmit() {
@@ -52,23 +53,22 @@ export class Register {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    // Casteamos el valor del form a nuestra interfaz RegisterDto
-    const formData = this.registerForm.value as unknown as RegisterDto;
+    // 👇 IMPORTANTE: Extraemos solo lo que el Backend necesita
+    // (Ignoramos confirmPassword)
+    const { confirmPassword, ...registerData } = this.registerForm.value;
+
+    // Casteamos a RegisterDto
+    const formData = registerData as RegisterDto;
 
     this.authService.register(formData).subscribe({
       next: () => {
         this.isLoading.set(false);
-        
-        // ✅ CAMBIO CRUCIAL AQUÍ:
-        // En lugar de ir al dashboard, vamos a la pantalla de verificación.
-        // Pasamos el email como "queryParams" para que el otro componente lo lea.
         this.router.navigate(['/auth/verify'], { 
           queryParams: { email: formData.email } 
         });
       },
       error: (err) => {
         this.isLoading.set(false);
-        // Manejo de errores (ej: slug duplicado)
         if (err.error?.message) {
           this.errorMessage.set(err.error.message);
         } else {

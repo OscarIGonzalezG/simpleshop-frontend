@@ -28,11 +28,8 @@ export class AuthService {
 
   // 📝 REGISTER
   register(data: RegisterDto) {
-    // Si no viene plan, asignamos 'free' por defecto
-    const payload = { ...data, plan: data.plan || 'free' };
-    
-    // El backend no devuelve token aquí, solo mensaje.
-    return this.http.post<any>(`${this.apiUrl}/register`, payload);
+    // 👇 CAMBIO: Ya no inyectamos 'plan' ni tenant data. Solo enviamos lo que viene del form.
+    return this.http.post<any>(`${this.apiUrl}/register`, data);
   }
 
   // ✅ VERIFICAR CUENTA
@@ -46,11 +43,9 @@ export class AuthService {
     );
   }
 
-  // 👇👇👇 ESTA ES LA FUNCIÓN NUEVA QUE FALTABA 👇👇👇
   resendCode(email: string) {
     return this.http.post<any>(`${this.apiUrl}/resend`, { email });
   }
-  // 👆👆👆
 
   // 💾 Guardar sesión
   private saveSession(response: AuthResponse) {
