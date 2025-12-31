@@ -10,14 +10,23 @@ import { TenantList } from './features/platform/tenant-list/tenant-list';
 import { UserList } from './features/platform/user-list/user-list';
 import { SystemLogs } from './features/platform/system-logs/system-logs';
 import { VerifyEmail } from './features/auth/verify-email/verify-email';
+import { Setup } from './features/platform/setup/setup';
+
+import { tenantGuard } from './core/guards/tenant';
 
 export const routes: Routes = [
 // Rutas Públicas
   { path: '', component: Landing },
   { path: 'auth/login', component: Login },
   { path: 'auth/register', component: Register },
-
   { path: 'auth/verify', component: VerifyEmail },
+
+// 👇 NUEVA RUTA DE ONBOARDING (Limpia, sin layout) 👇
+  { 
+    path: 'setup', 
+    component: Setup,
+    // canActivate: [authGuard] // Recomendado: Descomenta si tienes el guard listo
+  },
 
   // Rutas Privadas (Admin)
   {
@@ -25,8 +34,12 @@ export const routes: Routes = [
     component: AdminLayout, // 1. El cascarón (Sidebar)
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: Dashboard }, // 2. El contenido
-      // { path: 'products', ... }, // Aquí irán los demás
+      
+      { 
+        path: 'dashboard', 
+        component: Dashboard, 
+        canActivate: [tenantGuard]
+      },
     ]
   },
 

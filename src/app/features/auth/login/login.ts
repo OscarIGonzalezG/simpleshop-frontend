@@ -16,7 +16,6 @@ export class Login {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Signals para estado reactivo
   isLoading = signal(false);
   errorMessage = signal('');
 
@@ -34,41 +33,45 @@ export class Login {
     const { email, password } = this.loginForm.value;
 
     this.authService.login({ email: email!, password: password! }).subscribe({
-      next: () => {
+      next: (response) => { // 👈 Recibimos la respuesta completa (user + tenant)
         this.isLoading.set(false);
 
-        const user = this.authService.currentUser();
+        const user = response.user;
+        const tenant = response.tenant;
 
-        if (user?.role === 'SUPER_ADMIN') {
-          console.log('👑 Super Admin detectado. Redirigiendo a Platform...');
+        console.log('✅ Login exitoso. Analizando redirección...');
+
+        // 1. SUPER ADMIN -> Panel de Plataforma
+        if (user.role === 'SUPER_ADMIN') {
+          console.log('👑 Super Admin. Go -> /platform');
           this.router.navigate(['/platform']);
-        } else {
-          console.log('🏢 Usuario de tienda detectado. Redirigiendo a Admin...');
-          this.router.navigate(['/admin']);
+          return;
         }
+
+        // 2. USUARIO CON TIENDA -> Panel de Administración
+        if (tenant) {
+          console.log('🏢 Tiene Tienda. Go -> /admin');
+          this.router.navigate(['/admin']);
+          return;
+        }
+
+        // 3. USUARIO NUEVO (SIN TIENDA) -> Onboarding
+        console.log('🚀 Usuario Nuevo. Go -> /setup');
+        this.router.navigate(['/setup']);
       },
       error: (err) => {
         this.isLoading.set(false);
-        
-        console.log('🚨 Error recibido:', err.error); // Para depurar en consola
+        console.log('🚨 Error recibido:', err.error);
 
-        // 👇👇 LÓGICA BLINDADA 👇👇
-        // 1. Revisamos si viene el código 'ACCOUNT_NOT_VERIFIED'
-        // 2. O SI el mensaje contiene la palabra "verificar" (por si el GlobalFilter borró el código)
         const errorCode = err.error?.code;
         const errorMessage = err.error?.message || '';
 
         if (errorCode === 'ACCOUNT_NOT_VERIFIED' || errorMessage.toLowerCase().includes('verificar')) {
-             console.log('⚠️ Cuenta no verificada. Redirigiendo a validación...');
-             
-             // Redirigimos pasando el email
-             this.router.navigate(['/auth/verify'], { 
-                 queryParams: { email: email } 
-             });
+             console.log('⚠️ Cuenta no verificada. Redirigiendo...');
+             this.router.navigate(['/auth/verify'], { queryParams: { email: email } });
              return; 
         }
 
-        // Si es otro error, mostramos mensaje
         this.errorMessage.set(errorMessage || 'Credenciales incorrectas o error de conexión.');
       }
     });

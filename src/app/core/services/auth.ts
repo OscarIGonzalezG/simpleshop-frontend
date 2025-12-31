@@ -14,25 +14,20 @@ export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  // 🧠 Signal tipada con 'User'
   currentUser = signal<User | null>(this.getUserFromStorage());
 
   constructor() {}
 
-  // 🔐 LOGIN
   login(credentials: LoginDto) {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => this.saveSession(response))
     );
   }
 
-  // 📝 REGISTER
   register(data: RegisterDto) {
-    // 👇 CAMBIO: Ya no inyectamos 'plan' ni tenant data. Solo enviamos lo que viene del form.
     return this.http.post<any>(`${this.apiUrl}/register`, data);
   }
 
-  // ✅ VERIFICAR CUENTA
   verifyAccount(email: string, code: string) {
     return this.http.post<AuthResponse>(`${this.apiUrl}/verify`, { email, code }).pipe(
       tap((response) => {
@@ -47,27 +42,36 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/resend`, { email });
   }
 
-  // 💾 Guardar sesión
-  private saveSession(response: AuthResponse) {
-    localStorage.setItem('token', response.access_token);
-    localStorage.setItem('user', JSON.stringify(response.user));
-    this.currentUser.set(response.user);
+  // 👇 NUEVO MÉTODO: Permite actualizar el usuario sin reloguear
+  // (Lo usaremos al finalizar el Onboarding)
+  updateCurrentUser(user: User) {
+    localStorage.setItem('user', JSON.stringify(user));
+    this.currentUser.set(user);
   }
 
-  // 🚪 Logout
+  private saveSession(response: AuthResponse) {
+    localStorage.setItem('token', response.access_token);
+    // Guardamos el tenantId dentro del objeto usuario para fácil acceso
+    const userWithTenant = { 
+        ...response.user, 
+        tenantId: response.tenant?.id,
+        tenant: response.tenant || undefined
+    };
+    localStorage.setItem('user', JSON.stringify(userWithTenant));
+    this.currentUser.set(userWithTenant);
+  }
+
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUser.set(null);
   }
 
-  // 🔄 Recuperar usuario
   private getUserFromStorage(): User | null {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   }
 
-  // ❓ ¿Está logueado?
   get isLoggedIn() {
     return !!this.currentUser();
   }

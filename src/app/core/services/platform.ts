@@ -17,41 +17,51 @@ export interface PlatformMetrics {
 export class PlatformService {
   private http = inject(HttpClient);
   
-  // Base para cosas de plataforma (/api/platform)
-  private platformUrl = `${environment.apiUrl}/platform`;
+  // Base URL global (/api)
+  private apiUrl = environment.apiUrl;
+
+  // ==========================================
+  // 📊 DASHBOARD & LOGS (/api/platform)
+  // ==========================================
   
-  // Base para usuarios (/api/users) - 👈 CORRECCIÓN AQUÍ
-  private usersUrl = `${environment.apiUrl}/users`;
-
   getMetrics() {
-    return this.http.get<PlatformMetrics>(`${this.platformUrl}/metrics`);
-  }
-
-  getTenants() {
-    return this.http.get<Tenant[]>(`${this.platformUrl}/tenants`);
-  }
-
-  toggleTenant(id: string) {
-    return this.http.patch<Tenant>(`${this.platformUrl}/tenants/${id}/toggle`, {});
+    return this.http.get<PlatformMetrics>(`${this.apiUrl}/platform/metrics`);
   }
 
   getLogs() {
-    return this.http.get<SystemLog[]>(`${this.platformUrl}/logs`);
+    return this.http.get<SystemLog[]>(`${this.apiUrl}/platform/logs`);
   }
 
   // ==========================================
-  // 👇 RUTAS CORREGIDAS (Apuntan a UsersController)
+  // 🏢 TENANTS (/api/tenants)
+  // ==========================================
+
+  getTenants() {
+    // Obtenemos la lista desde el controlador principal
+    return this.http.get<Tenant[]>(`${this.apiUrl}/tenants`);
+  }
+
+  // 👇 MÉTODO CORREGIDO: Acepta el estado para enviarlo al backend
+  toggleTenant(id: string, isActive?: boolean) {
+    // Si isActive no se pasa, enviamos undefined (o podrías manejar la lógica inversa aquí)
+    const payload = isActive !== undefined ? { isActive } : {};
+    return this.http.patch<Tenant>(`${this.apiUrl}/tenants/${id}/status`, payload);
+  }
+
+  // 👇 ESTE ES EL CRUCIAL PARA EL ONBOARDING
+  createTenant(data: { businessName: string; slug: string }) {
+    return this.http.post<Tenant>(`${this.apiUrl}/tenants`, data);
+  }
+
+  // ==========================================
+  // 👥 USERS (/api/users)
   // ==========================================
 
   getUsers() {
-    // Antes: this.platformUrl + '/users' -> /api/platform/users (ERROR 404)
-    // Ahora: this.usersUrl -> /api/users (CORRECTO)
-    return this.http.get<User[]>(this.usersUrl);
+    return this.http.get<any[]>(`${this.apiUrl}/users`);
   }
 
   toggleUserBlock(userId: string, isActive: boolean) {
-    // Antes: /api/platform/users/:id/status (ERROR 404)
-    // Ahora: /api/users/:id/status (CORRECTO)
-    return this.http.patch(`${this.usersUrl}/${userId}/status`, { isActive });
+    return this.http.patch(`${this.apiUrl}/users/${userId}/status`, { isActive });
   }
 }
