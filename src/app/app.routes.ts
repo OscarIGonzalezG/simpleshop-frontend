@@ -1,49 +1,61 @@
 import { Routes } from '@angular/router';
+
+// 1. AUTH & PUBLIC
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
-import { Landing } from './features/landing/landing';
-import { AdminLayout } from './layout/admin-layout/admin-layout';
+import { VerifyEmail } from './features/auth/verify-email/verify-email';
+import { Landing } from './features/shop/landing/landing'; // 👈 MUDADO A SHOP
+
+// 2. ONBOARDING
+import { Setup } from './features/onboarding/setup/setup'; // 👈 MUDADO A ONBOARDING
+
+// 3. LAYOUTS
+import { AdminLayout } from './layouts/admin/admin-layout/admin-layout';     // 👈 RENOMBRADO A LAYOUTS
+import { PlatformLayout } from './layouts/platform/platform-layout/platform-layout'; // 👈 RENOMBRADO A LAYOUTS
+
+// 4. ADMIN FEATURES (Dueño de Bodega)
 import { Dashboard } from './features/admin/dashboard/dashboard';
-import { PlatformLayout } from './layout/platform-layout/platform-layout';
+
+// 5. PLATFORM FEATURES (Super Admin)
 import { Dashboard as PlatformDashboard } from './features/platform/dashboard/dashboard';
 import { TenantList } from './features/platform/tenant-list/tenant-list';
 import { UserList } from './features/platform/user-list/user-list';
 import { SystemLogs } from './features/platform/system-logs/system-logs';
-import { VerifyEmail } from './features/auth/verify-email/verify-email';
-import { Setup } from './features/platform/setup/setup';
 
+// GUARDS
 import { tenantGuard } from './core/guards/tenant';
 
 export const routes: Routes = [
-// Rutas Públicas
+  // --- RUTAS PÚBLICAS (Landing & Auth) ---
   { path: '', component: Landing },
   { path: 'auth/login', component: Login },
   { path: 'auth/register', component: Register },
   { path: 'auth/verify', component: VerifyEmail },
 
-// 👇 NUEVA RUTA DE ONBOARDING (Limpia, sin layout) 👇
+  // --- ONBOARDING (Creación de Bodega/Tienda) ---
   { 
     path: 'setup', 
     component: Setup,
-    // canActivate: [authGuard] // Recomendado: Descomenta si tienes el guard listo
+    // canActivate: [authGuard] // Idealmente descomentar cuando integres AuthGuard
   },
 
-  // Rutas Privadas (Admin)
+  // --- PANEL ADMINISTRATIVO (Dueño del Negocio) ---
   {
     path: 'admin',
-    component: AdminLayout, // 1. El cascarón (Sidebar)
+    component: AdminLayout,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       
       { 
         path: 'dashboard', 
         component: Dashboard, 
-        canActivate: [tenantGuard]
+        canActivate: [tenantGuard] // Protege que tenga tienda creada
       },
+      // Aquí agregaremos luego: 'products', 'inventory', 'orders'
     ]
   },
 
-  // 👇 RUTAS PLATFORM (Para TI, el Super Admin)
+  // --- PLATAFORMA SAAS (Super Admin - TÚ) ---
   {
     path: 'platform',
     component: PlatformLayout,
@@ -56,5 +68,6 @@ export const routes: Routes = [
     ]
   },
 
+  // --- FALLBACK ---
   { path: '**', redirectTo: '' }
 ];
