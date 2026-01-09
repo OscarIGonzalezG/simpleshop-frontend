@@ -1,105 +1,173 @@
 @import "tailwindcss";
 
-@theme {
-  /* --- COLORES: NOIR LUXURY --- */
+/* =========================================
+   1. VARIABLES DE TEMA (CSS VARIABLES)
+   ========================================= */
+:root {
+  /* --- MODO CLARO (Default - Para Clientes) --- */
+  /* Fondo: Gris muy pálido para evitar fatiga visual del blanco puro */
+  --color-bg-app: #F8FAFC;       /* Slate 50 */
+  --color-surface: #FFFFFF;      /* White */
+  --color-surface-highlight: #F1F5F9; /* Slate 100 */
   
-  /* Fondos: Oscuros pero cálidos */
-  --color-noir-bg: #0a0a0a;       
-  --color-noir-surface: #171717;  
-  --color-noir-border: #404040;
+  /* Bordes y Líneas */
+  --color-border: #E2E8F0;       /* Slate 200 */
   
-  /* Acentos: Ámbar / Oro Viejo / Bronce */
-  --color-brand-primary: #F59E0B;  /* Ámbar */
-  --color-brand-hover: #D97706;    /* Bronce */
-  --color-brand-glow: rgba(245, 158, 11, 0.5); /* Glow dorado */
+  /* Textos */
+  --color-text-main: #0F172A;    /* Slate 900 (Casi negro, elegante) */
+  --color-text-muted: #64748B;   /* Slate 500 */
+  --color-text-inverted: #FFFFFF; 
+
+  /* Inputs */
+  --color-input-bg: #FFFFFF;
   
+  /* --- MARCA (Se mantiene igual en ambos modos) --- */
+  --color-brand-primary: #4F46E5;  /* Indigo 600 - Vibrante pero serio */
+  --color-brand-hover: #4338CA;    /* Indigo 700 - Más profundo para hover */
+  --color-brand-glow: rgba(99, 102, 241, 0.4); /* Glow suave índigo */
+
+  /* Tipografía */
   --font-display: 'Inter', sans-serif;
   --font-body: 'Inter', sans-serif;
-  
+
+  /* Radios */
   --radius-card: 12px;
-  --radius-btn: 4px;
+  --radius-btn: 6px; /* Un poco más suave que 4px */
 }
 
+/* --- MODO OSCURO (Para Super Admin / Platform) --- */
+/* Se activa poniendo la clase "dark-theme" en el body o en un contenedor */
+.dark-theme {
+  --color-bg-app: #0a0a0a; 
+  --color-surface: #171717;
+  --color-surface-highlight: #262626;
+  --color-border: #404040;
+  
+  --color-text-main: #e5e5e5;
+  --color-text-muted: #a3a3a3;
+  --color-text-inverted: #000000;
+
+  --color-input-bg: rgba(0,0,0, 0.5);
+  
+  --color-brand-glow: rgba(245, 158, 11, 0.5); /* Glow más fuerte en dark */
+}
+
+/* =========================================
+   2. CONFIGURACIÓN TAILWIND 4 (@theme)
+   ========================================= */
+@theme {
+  /* Mapeamos las variables CSS a clases de Tailwind */
+  
+  /* Colores Base */
+  --color-canvas: var(--color-bg-app);
+  --color-card: var(--color-surface);
+  --color-card-highlight: var(--color-surface-highlight);
+  --color-line: var(--color-border);
+  
+  /* Textos */
+  --color-txt-main: var(--color-text-main);
+  --color-txt-muted: var(--color-text-muted);
+  --color-txt-inverted: var(--color-text-inverted);
+
+  /* Marca */
+  --color-brand: var(--color-brand-primary);
+  --color-brand-dark: var(--color-brand-hover);
+  
+  /* Z-Index Extra */
+  --z-index-9999: 9999;
+  --z-index-10000: 10000;
+}
+
+/* =========================================
+   3. ESTILOS BASE
+   ========================================= */
 body {
-  background-color: var(--color-noir-bg);
-  color: #e5e5e5;
+  background-color: var(--color-bg-app);
+  color: var(--color-text-main);
   font-family: var(--font-body);
-  /* Textura de ruido */
+  transition: background-color 0.3s ease, color 0.3s ease;
+  /* Eliminamos el ruido en Light Mode para que se vea limpio */
+}
+
+/* Solo agregamos ruido si está en modo oscuro */
+.dark-theme body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
 }
 
-/* --- UTILIDADES PERSONALIZADAS --- */
+/* =========================================
+   4. UTILIDADES (@layer utilities)
+   ========================================= */
 @layer utilities {
   
-  /* Efecto Vidrio Ahumado */
+  /* Efecto Vidrio (Adaptativo) */
   .glass-panel {
-    background: rgba(23, 23, 23, 0.7);
-    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.7); /* Vidrio blanco por defecto */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  .dark-theme .glass-panel {
+    background: rgba(23, 23, 23, 0.7); /* Vidrio oscuro en dark theme */
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 
-      0 4px 30px rgba(0, 0, 0, 0.5),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   }
   
-  /* --- SCROLLBAR "INDUSTRIAL" (VISIBLE) --- */
-  
-  /* Ancho de la barra */
+  /* --- SCROLLBAR --- */
+  /* Scrollbar limpia para light mode */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
   }
-
-  /* El riel (Track): Ligeramente más claro que el fondo para que se note el camino */
   .custom-scrollbar::-webkit-scrollbar-track {
-    background-color: rgba(255, 255, 255, 0.05); 
-    border-radius: 4px;
+    background: transparent;
   }
-
-  /* La barra móvil (Thumb): Gris visible por defecto */
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #525252; 
+    background-color: #CBD5E1; /* Slate 300 */
     border-radius: 4px;
-    border: 2px solid #0a0a0a; /* Margen interno */
   }
-
-  /* Hover: SE ENCIENDE EN ÁMBAR */
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-brand-primary); 
-    box-shadow: 0 0 10px var(--color-brand-glow);
+    background-color: var(--color-brand-primary);
   }
 
-  /* Firefox */
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #525252 rgba(255, 255, 255, 0.05);
+  /* Scrollbar "Industrial" solo para Dark Mode */
+  .dark-theme .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #525252;
+    border: 2px solid #0a0a0a;
   }
 }
 
-/* --- COMPONENTES --- */
+/* =========================================
+   5. COMPONENTES (@layer components)
+   ========================================= */
 @layer components {
+  
+  /* Botón Principal: Naranja sobre Negro/Blanco */
   .btn-primary {
-    @apply bg-brand-primary text-black font-bold px-6 py-3 
+    @apply bg-brand text-black font-bold px-6 py-3 
            rounded-(--radius-btn) tracking-widest uppercase text-xs
-           hover:bg-brand-hover hover:shadow-[0_0_20px_var(--color-brand-glow)]
+           hover:bg-brand-dark hover:shadow-[0_0_15px_var(--color-brand-glow)]
            transition-all duration-300 cursor-pointer flex items-center justify-center gap-2;
   }
 
+  /* Botón Secundario: Borde Gris en Light / Borde Blanco en Dark */
   .btn-secondary {
-    @apply bg-transparent border border-white/20 text-white font-bold px-6 py-3 
+    @apply bg-transparent border border-line text-txt-main font-bold px-6 py-3 
            rounded-(--radius-btn) tracking-widest uppercase text-xs
-           hover:border-brand-primary hover:text-brand-primary
+           hover:border-brand hover:text-brand
            transition-all duration-300 cursor-pointer;
   }
   
-  .input-noir {
-    @apply w-full bg-black/50 border border-white/10 px-4 py-3 
-           rounded-(--radius-btn) text-white placeholder-white/20
-           focus:outline-none focus:border-brand-primary focus:bg-black
+  /* Input Adaptativo */
+  .input-base {
+    @apply w-full bg-canvas border border-line px-4 py-3 
+           rounded-(--radius-btn) text-txt-main placeholder-txt-muted
+           focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand
            transition-all duration-300;
   }
-}
-
-@theme {
-  --z-index-9999: 9999;
-  --z-index-10000: 10000;
+  
+  /* Tarjetas (Cards) */
+  .card-base {
+    @apply bg-card border border-line rounded-(--radius-card) p-6 shadow-sm;
+  }
 }
